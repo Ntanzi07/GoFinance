@@ -1,11 +1,11 @@
-# 💸 GoFinance — Financial Control API with Go + MariaDB
+# GoFinance — Financial Control API with Go + MariaDB
 
 A practical challenge to build a **RESTful API for personal financial management**, developed in **Go (Golang)** with persistence in **MariaDB**.  
 The goal is to create a modular and high-performance application to manage **income**, **expenses**, and **total balance**, applying best practices in architecture, testing, and documentation.
 
 ---
 
-## 🎯 Objective
+## Objective
 
 Implement an API that allows users to:
 - Register **financial transactions** (income and expenses);
@@ -15,19 +15,19 @@ Implement an API that allows users to:
 
 ---
 
-## 🧱 Features
+## Features
 
 | Category | Description |
 |-----------|--------------|
-| 💰 **Transactions** | Create, list, update, and delete financial transactions |
-| 📊 **Reports** | Retrieve total balance, category summary, and period summary |
-| 🗓️ **Filters** | Filter by type (`income` or `expense`), category, and date range |
-| 🧾 **Categories** | Full CRUD for custom categories |
-| 🔒 **Authentication (extra)** | *(Optional challenge)* Implement JWT authentication and user control |
+| **Transactions** | Create, list, update, and delete financial transactions |
+| **Reports** | Retrieve total balance, category summary, and period summary |
+| **Filters** | Filter by type (`income` or `expense`), category, and date range |
+| **Categories** | Full CRUD for custom categories |
+| **Authentication (extra)** | *(Optional challenge)* Implement JWT authentication and user control |
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 - **Go 1.22+**
 - **MariaDB 10+**
@@ -39,7 +39,7 @@ Implement an API that allows users to:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 gofinance/
@@ -74,15 +74,15 @@ gofinance/
 
 ---
 
-## ⚡ Environment Setup
+## Environment Setup
 
-### 1️⃣ Clone the repository
+### Clone the repository
 ```bash
 git clone https://github.com/yourusername/gofinance.git
 cd gofinance
 ```
 
-### 2️⃣ Create the `.env` file
+### Create the `.env` file
 ```env
 DB_HOST=localhost
 DB_PORT=3306
@@ -92,24 +92,24 @@ DB_NAME=gofinance
 APP_PORT=8080
 ```
 
-### 3️⃣ Start the environment with Docker
+### Start the environment with Docker
 ```bash
 docker-compose up -d
 ```
 
-### 4️⃣ Run the application
+### Run the application
 ```bash
 go run cmd/main.go
 ```
 
 The API will be available at:  
-👉 `http://localhost:8080/api`
+ `http://localhost:8080/api`
 
 ---
 
-## 🧩 Example Endpoints
+## Example Endpoints
 
-### 🔹 Transactions
+### Transactions
 | Method | Endpoint | Description |
 |--------|-----------|-------------|
 | `POST` | `/api/transactions` | Create a new transaction |
@@ -118,7 +118,7 @@ The API will be available at:
 | `PUT` | `/api/transactions/:id` | Update a transaction |
 | `DELETE` | `/api/transactions/:id` | Delete a transaction |
 
-### 🔹 Categories
+### Categories
 | Method | Endpoint | Description |
 |--------|-----------|-------------|
 | `POST` | `/api/categories` | Create a new category |
@@ -126,7 +126,7 @@ The API will be available at:
 | `PUT` | `/api/categories/:id` | Update a category |
 | `DELETE` | `/api/categories/:id` | Delete a category |
 
-### 🔹 Reports
+### Reports
 | Method | Endpoint | Description |
 |--------|-----------|-------------|
 | `GET` | `/api/reports/summary` | Get total balance and general summary |
@@ -134,7 +134,7 @@ The API will be available at:
 
 ---
 
-## 🧠 Extra Challenges
+## Extra Challenges
 
 - Implement **JWT authentication** and multiple users.  
 - Add **unit and integration tests**.  
@@ -144,10 +144,10 @@ The API will be available at:
 
 ---
 
-## 🧑‍💻 Author
+##  Author
 
 **Nathan Tanzi**  
-[GitHub](https://github.com/yourusername) • [LinkedIn](https://linkedin.com/in/yourlinkedin)
+[GitHub](https://github.com/Ntanzi07) • [LinkedIn](https://linkedin.com/in/nathan-tanzi)
 
 ---
 
