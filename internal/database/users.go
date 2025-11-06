@@ -34,6 +34,15 @@ func GetAllUsers(db *sql.DB) ([]User, error) {
 	return users, nil
 }
 
+func GetUserByID(db *sql.DB, id int) (User, error) {
+	var u User
+	err := db.QueryRow("CALL GetUserById(?)", id).Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt)
+	if err != nil {
+		return u, err
+	}
+	return u, nil
+}
+
 func CreateUser(db *sql.DB, name, email, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -45,4 +54,25 @@ func CreateUser(db *sql.DB, name, email, password string) error {
 	}
 	fmt.Println("User created:", email)
 	return nil
+}
+
+func DeleteUser(db *sql.DB, userID int) error {
+	user, err := GetUserByID(db, userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("CALL DeleteUser(?)", userID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("User deleted:")
+	fmt.Println(printUser(user))
+	return nil
+}
+
+func printUser(u User) string {
+	userInfos := fmt.Sprintf("%d \t| %s \t| %s \t| %s \t| %s \t|\n", u.ID, u.Name, u.Email, u.Password, u.CreatedAt)
+	return userInfos
 }
