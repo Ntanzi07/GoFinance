@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/Ntanzi07/gofinance/internal/models"
 	"golang.org/x/crypto/bcrypt"
@@ -32,7 +31,6 @@ func (r *UsersRepository) GetAllUsers() ([]models.User, error) {
 		}
 		users = append(users, u)
 	}
-	fmt.Println("Users loaded:", len(users))
 	return users, nil
 }
 
@@ -56,13 +54,12 @@ func (r *UsersRepository) CreateUser(name, email, password string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("User created:", email)
 	return nil
 }
 
 // DeleteUser deletes a user by ID after retrieving and printing their information.
 func (r *UsersRepository) DeleteUser(userID int) error {
-	user, err := r.GetUserByID(userID)
+	_, err := r.GetUserByID(userID)
 	if err != nil {
 		return err
 	}
@@ -72,6 +69,5 @@ func (r *UsersRepository) DeleteUser(userID int) error {
 		return err
 	}
 
-	fmt.Printf("User deleted with ID: %d", user.ID)
 	return nil
 }
