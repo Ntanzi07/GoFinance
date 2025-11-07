@@ -36,6 +36,17 @@ func (h *UsersHandler) GetUserByIdHandler(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+func (h *UsersHandler) GetUserByNameHandler(c *fiber.Ctx) error {
+	name := c.Params("name")
+
+	user, err := h.Repo.GetUserByName(name)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error retrieving user")
+	}
+
+	return c.JSON(user)
+}
+
 func (h *UsersHandler) CreateUserHandler(c *fiber.Ctx) error {
 	var user models.User
 	if err := c.BodyParser(&user); err != nil {

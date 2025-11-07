@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/Ntanzi07/gofinance/internal/models"
 )
@@ -48,7 +47,6 @@ func (r *TransactionRepository) CreateTransaction(userID int, tType string, amou
 	if err != nil {
 		return err
 	}
-	fmt.Println("Transaction created for user ID:", userID)
 	return nil
 }
 
@@ -57,6 +55,5 @@ func (r *TransactionRepository) DeleteTransaction(transactionID int) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Transaction deleted with ID:", transactionID)
 	return nil
 }

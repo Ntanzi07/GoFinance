@@ -37,7 +37,28 @@ func (r *UsersRepository) GetAllUsers() ([]models.User, error) {
 // GetUserByID retrieves a user by their ID.
 func (r *UsersRepository) GetUserByID(id int) (models.User, error) {
 	var u models.User
-	err := r.DB.QueryRow("CALL GetUserById(?)", id).Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt)
+	err := r.DB.QueryRow("CALL GetUserById(?)", id).Scan(
+		&u.ID,
+		&u.Name,
+		&u.Email,
+		&u.Password,
+		&u.CreatedAt,
+	)
+	if err != nil {
+		return u, err
+	}
+	return u, nil
+}
+
+func (r *UsersRepository) GetUserByName(name string) (models.User, error) {
+	var u models.User
+	err := r.DB.QueryRow("CALL GetUserByName(?)", name).Scan(
+		&u.ID,
+		&u.Name,
+		&u.Email,
+		&u.Password,
+		&u.CreatedAt,
+	)
 	if err != nil {
 		return u, err
 	}

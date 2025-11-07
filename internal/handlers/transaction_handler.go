@@ -38,13 +38,14 @@ func (h *TransactionHandler) GetTransactionByIdHandler(c *fiber.Ctx) error {
 
 func (h *TransactionHandler) CreateTransactionHandler(c *fiber.Ctx) error {
 	var transaction models.Transaction
-	err := c.BodyParser(&transaction)
-	if err != nil {
+
+	if err := c.BodyParser(&transaction); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	if err := h.Repo.CreateTransaction(
-		transaction.ID, transaction.Type,
+		transaction.UserID,
+		transaction.Type,
 		transaction.Amount,
 		transaction.Description,
 		transaction.Date,
