@@ -4,17 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/Ntanzi07/gofinance/internal/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type User struct {
-	ID        int
-	Name      string
-	Email     string
-	Password  string
-	CreatedAt string
-}
+type User models.User
 
+// GetAllUsers retrieves all users from the database.
 func GetAllUsers(db *sql.DB) ([]User, error) {
 	rows, err := db.Query("CALL GetAllUsers()")
 	if err != nil {
@@ -34,6 +30,7 @@ func GetAllUsers(db *sql.DB) ([]User, error) {
 	return users, nil
 }
 
+// GetUserByID retrieves a user by their ID.
 func GetUserByID(db *sql.DB, id int) (User, error) {
 	var u User
 	err := db.QueryRow("CALL GetUserById(?)", id).Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt)
@@ -43,6 +40,7 @@ func GetUserByID(db *sql.DB, id int) (User, error) {
 	return u, nil
 }
 
+// CreateUser creates a new user with hashed password.
 func CreateUser(db *sql.DB, name, email, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -56,6 +54,7 @@ func CreateUser(db *sql.DB, name, email, password string) error {
 	return nil
 }
 
+// DeleteUser deletes a user by ID after retrieving and printing their information.
 func DeleteUser(db *sql.DB, userID int) error {
 	user, err := GetUserByID(db, userID)
 	if err != nil {
