@@ -1,4 +1,4 @@
-package database
+package repository
 
 import (
 	"database/sql"
@@ -66,12 +66,6 @@ func DeleteUser(db *sql.DB, userID int) error {
 		return err
 	}
 
-	fmt.Println("User deleted:")
-	fmt.Println(printUser(user))
+	fmt.Printf("User deleted with ID: %d", user.ID)
 	return nil
-}
-
-func printUser(u User) string {
-	userInfos := fmt.Sprintf("%d \t| %s \t| %s \t| %s \t| %s \t|\n", u.ID, u.Name, u.Email, u.Password, u.CreatedAt)
-	return userInfos
 }

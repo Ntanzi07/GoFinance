@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Ntanzi07/gofinance/internal/database"
+	"github.com/Ntanzi07/gofinance/internal/repository"
 )
 
 func main() {
@@ -13,43 +14,28 @@ func main() {
 		panic(err)
 	}
 
-	//create a new user
-	err = database.CreateUser(db, "Teste3", "teste3@example.com", "123456")
-	if err != nil {
+	if err = repository.CreateTransaction(db, 1, "income", 1917.18, "Freelance project", "15/11/2025"); err != nil {
 		panic(err)
 	}
 
-	//get user by ID
-	user, err := database.GetUserByID(db, 1)
+	transaction, err := repository.GetTransactionByID(db, 3)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("User ID: %d \t| %s \t| %s \t| %s \t| %s \t|\n", user.ID, user.Name, user.Email, user.Password, user.CreatedAt)
+	fmt.Println("Transaction retrieved:", transaction)
 
-	//get all users
-	users, err := database.GetAllUsers(db)
+	transactions, err := repository.GetAllTransactions(db)
 	if err != nil {
 		panic(err)
 	}
-
-	for _, u := range users {
-		fmt.Printf("%d \t| %s \t| %s \t| %s \t| %s \t|\n", u.ID, u.Name, u.Email, u.Password, u.CreatedAt)
+	for _, t := range transactions {
+		fmt.Println(t)
 	}
 
-	//delete user by ID
-	err = database.DeleteUser(db, 3)
-	if err != nil {
-		panic(err)
-	}
-
-	//get all users after deletion
-	users, err = database.GetAllUsers(db)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, u := range users {
-		fmt.Printf("%d \t| %s \t| %s \t| %s \t| %s \t|\n", u.ID, u.Name, u.Email, u.Password, u.CreatedAt)
-	}
+	/*
+		if err = repository.DeleteTransaction(db, 1); err != nil {
+			panic(err)
+		}
+	*/
 
 }
