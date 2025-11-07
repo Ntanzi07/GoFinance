@@ -7,19 +7,24 @@ import (
 	"github.com/Ntanzi07/gofinance/internal/models"
 )
 
-type Transaction models.Transaction
-type TransactionWithUser models.TransactionWithUser
+type TransactionRepository struct {
+	DB *sql.DB
+}
 
-func GetAllTransactions(db *sql.DB) ([]TransactionWithUser, error) {
-	rows, err := db.Query("Call GetAllTransactions()")
+func NewTransactionRepository(db *sql.DB) *TransactionRepository {
+	return &TransactionRepository{DB: db}
+}
+
+func (r *TransactionRepository) GetAllTransactions() ([]models.TransactionWithUser, error) {
+	rows, err := r.DB.Query("Call GetAllTransactions()")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var transactions []TransactionWithUser
+	var transactions []models.TransactionWithUser
 	for rows.Next() {
-		var t TransactionWithUser
+		var t models.TransactionWithUser
 		if err := rows.Scan(&t.ID, &t.Type, &t.Amount, &t.Description, &t.Date, &t.UserName, &t.UserEmail); err != nil {
 			return nil, err
 		}
@@ -29,17 +34,17 @@ func GetAllTransactions(db *sql.DB) ([]TransactionWithUser, error) {
 	return transactions, nil
 }
 
-func GetTransactionByID(db *sql.DB, id int) (TransactionWithUser, error) {
-	var t TransactionWithUser
-	err := db.QueryRow("CALL GetTransactionById(?)", id).Scan(&t.ID, &t.Type, &t.Amount, &t.Description, &t.Date, &t.UserName, &t.UserEmail)
+func (r *TransactionRepository) GetTransactionByID(id int) (models.TransactionWithUser, error) {
+	var t models.TransactionWithUser
+	err := r.DB.QueryRow("CALL GetTransactionById(?)", id).Scan(&t.ID, &t.Type, &t.Amount, &t.Description, &t.Date, &t.UserName, &t.UserEmail)
 	if err != nil {
-		return TransactionWithUser{}, err
+		return models.TransactionWithUser{}, err
 	}
 	return t, nil
 }
 
-func CreateTransaction(db *sql.DB, userID int, tType string, amount float64, description, date string) error {
-	_, err := db.Exec("CALL CreateTransaction(?,?,?,?,?)", userID, tType, amount, description, date)
+func (r *TransactionRepository) CreateTransaction(userID int, tType string, amount float64, description, date string) error {
+	_, err := r.DB.Exec("CALL CreateTransaction(?,?,?,?,?)", userID, tType, amount, description, date)
 	if err != nil {
 		return err
 	}
@@ -47,8 +52,8 @@ func CreateTransaction(db *sql.DB, userID int, tType string, amount float64, des
 	return nil
 }
 
-func DeleteTransaction(db *sql.DB, transactionID int) error {
-	_, err := db.Exec("CALL DeleteTransaction(?)", transactionID)
+func (r *TransactionRepository) DeleteTransaction(transactionID int) error {
+	_, err := r.DB.Exec("CALL DeleteTransaction(?)", transactionID)
 	if err != nil {
 		return err
 	}

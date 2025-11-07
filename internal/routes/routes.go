@@ -1,11 +1,13 @@
 package routes
 
 import (
+	"database/sql"
+
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRoutes(app *fiber.App) {
+func SetupRoutes(app *fiber.App, db *sql.DB) {
 
-	setupRoutesUser(app)
-	setupTransactionRoutes(app)
+	setupRoutesUser(app, db)
+	setupTransactionRoutes(app, db)
 }

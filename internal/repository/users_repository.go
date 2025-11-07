@@ -8,19 +8,25 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type User models.User
+type UsersRepository struct {
+	DB *sql.DB
+}
+
+func NewUsersRepository(db *sql.DB) *UsersRepository {
+	return &UsersRepository{DB: db}
+}
 
 // GetAllUsers retrieves all users from the database.
-func GetAllUsers(db *sql.DB) ([]User, error) {
-	rows, err := db.Query("CALL GetAllUsers()")
+func (r *UsersRepository) GetAllUsers() ([]models.User, error) {
+	rows, err := r.DB.Query("CALL GetAllUsers()")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var users []User
+	var users []models.User
 	for rows.Next() {
-		var u User
+		var u models.User
 		if err := rows.Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt); err != nil {
 			return nil, err
 		}
@@ -31,9 +37,9 @@ func GetAllUsers(db *sql.DB) ([]User, error) {
 }
 
 // GetUserByID retrieves a user by their ID.
-func GetUserByID(db *sql.DB, id int) (User, error) {
-	var u User
-	err := db.QueryRow("CALL GetUserById(?)", id).Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt)
+func (r *UsersRepository) GetUserByID(id int) (models.User, error) {
+	var u models.User
+	err := r.DB.QueryRow("CALL GetUserById(?)", id).Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt)
 	if err != nil {
 		return u, err
 	}
@@ -41,12 +47,12 @@ func GetUserByID(db *sql.DB, id int) (User, error) {
 }
 
 // CreateUser creates a new user with hashed password.
-func CreateUser(db *sql.DB, name, email, password string) error {
+func (r *UsersRepository) CreateUser(name, email, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("CALL CreateUser(?,?,?)", name, email, string(hashed))
+	_, err = r.DB.Exec("CALL CreateUser(?,?,?)", name, email, string(hashed))
 	if err != nil {
 		return err
 	}
@@ -55,13 +61,13 @@ func CreateUser(db *sql.DB, name, email, password string) error {
 }
 
 // DeleteUser deletes a user by ID after retrieving and printing their information.
-func DeleteUser(db *sql.DB, userID int) error {
-	user, err := GetUserByID(db, userID)
+func (r *UsersRepository) DeleteUser(userID int) error {
+	user, err := r.GetUserByID(userID)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.Exec("CALL DeleteUser(?)", userID)
+	_, err = r.DB.Exec("CALL DeleteUser(?)", userID)
 	if err != nil {
 		return err
 	}
