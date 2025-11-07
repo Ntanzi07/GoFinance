@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/Ntanzi07/gofinance/internal/database"
-	"github.com/Ntanzi07/gofinance/internal/repository"
+	"github.com/Ntanzi07/gofinance/internal/routes"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -13,29 +12,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
-	if err = repository.CreateTransaction(db, 1, "income", 1917.18, "Freelance project", "15/11/2025"); err != nil {
-		panic(err)
-	}
+	app := fiber.New()
 
-	transaction, err := repository.GetTransactionByID(db, 3)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Transaction retrieved:", transaction)
-
-	transactions, err := repository.GetAllTransactions(db)
-	if err != nil {
-		panic(err)
-	}
-	for _, t := range transactions {
-		fmt.Println(t)
-	}
-
-	/*
-		if err = repository.DeleteTransaction(db, 1); err != nil {
-			panic(err)
-		}
-	*/
+	routes.SetupRoutes(app)
+	app.Listen(":8080")
 
 }
