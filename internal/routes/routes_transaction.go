@@ -18,5 +18,5 @@ func setupTransactionRoutes(app *fiber.App, db *sql.DB) {
 	app.Post("/transactions", handler.CreateTransactionHandler)
 	app.Delete("/transactions/:id", handler.DeleteTransacionHandler)
 
-	// TODO: app.Get("/:name/transactions")
+	app.Get("/:name/transactions", handler.GetTransactionsByUserHandler)
 }

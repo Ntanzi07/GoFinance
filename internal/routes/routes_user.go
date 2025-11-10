@@ -17,5 +17,5 @@ func setupRoutesUser(app *fiber.App, db *sql.DB) {
 	app.Get("/users/:id", handler.GetUserByIdHandler)
 	app.Get("/:name", handler.GetUserByNameHandler)
 	app.Post("/users", handler.CreateUserHandler)
-	app.Delete("/:id", handler.DeleteUserHandler)
+	app.Delete("/users/:id", handler.DeleteUserHandler)
 }

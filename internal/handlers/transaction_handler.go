@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/Ntanzi07/gofinance/internal/models"
 	"github.com/Ntanzi07/gofinance/internal/repository"
 	"github.com/gofiber/fiber/v2"
@@ -17,7 +19,7 @@ func NewTransactionHandler(repo *repository.TransactionRepository) *TransactionH
 func (h *TransactionHandler) GetAllTransactionsHandler(c *fiber.Ctx) error {
 	transactions, err := h.Repo.GetAllTransactions()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error fetching transactions")
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	return c.JSON(transactions)
 }
@@ -25,12 +27,23 @@ func (h *TransactionHandler) GetAllTransactionsHandler(c *fiber.Ctx) error {
 func (h *TransactionHandler) GetTransactionByIdHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid transaction ID")
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
 	transaction, err := h.Repo.GetTransactionByID(id)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error fetching transaction")
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.JSON(transaction)
+}
+
+func (h *TransactionHandler) GetTransactionsByUserHandler(c *fiber.Ctx) error {
+	name := c.Params("name")
+	fmt.Println("nome:", name)
+	transaction, err := h.Repo.GetAllTransactionsByUser(name)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
 	return c.JSON(transaction)
@@ -40,7 +53,7 @@ func (h *TransactionHandler) CreateTransactionHandler(c *fiber.Ctx) error {
 	var transaction models.Transaction
 
 	if err := c.BodyParser(&transaction); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
 	if err := h.Repo.CreateTransaction(
@@ -50,7 +63,7 @@ func (h *TransactionHandler) CreateTransactionHandler(c *fiber.Ctx) error {
 		transaction.Description,
 		transaction.Date,
 	); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error creating Transaction")
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
 	return c.SendString("Transaction created successfully")
@@ -59,11 +72,11 @@ func (h *TransactionHandler) CreateTransactionHandler(c *fiber.Ctx) error {
 func (h *TransactionHandler) DeleteTransacionHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid user ID")
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
 	if err := h.Repo.DeleteTransaction(id); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error deleting Transaction")
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
 	return c.SendString("Transaction deleted successfully")

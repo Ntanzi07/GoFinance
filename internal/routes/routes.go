@@ -8,6 +8,6 @@ import (
 
 func SetupRoutes(app *fiber.App, db *sql.DB) {
 
-	setupRoutesUser(app, db)
 	setupTransactionRoutes(app, db)
+	setupRoutesUser(app, db)
 }
