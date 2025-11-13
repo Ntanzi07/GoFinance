@@ -8,18 +8,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func setupRoutesUser(app *fiber.App, db *sql.DB) {
+func setupRoutesAuth(app *fiber.App, db *sql.DB) {
 
 	repo := repository.NewUsersRepository(db)
-	handler := handlers.NewUsersHandler(repo)
+	handler := handlers.NewAuthHandler(repo)
 
 	app.Post("/login", handler.LoginUserHandler)
+	app.Post("/singup", handler.SingupUserHandler)
 
-	/*
-		app.Get("/users", handler.GetAllUserHandler)
-		app.Get("/users/:id", handler.GetUserByIdHandler)
-		app.Get("/:name", handler.GetUserByNameHandler)
-		app.Post("/users", handler.CreateUserHandler)
-		app.Delete("/users/:id", handler.DeleteUserHandler)
-	*/
 }

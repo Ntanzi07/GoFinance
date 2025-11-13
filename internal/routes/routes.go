@@ -8,6 +8,7 @@ import (
 
 func SetupRoutes(app *fiber.App, db *sql.DB) {
 
+	setupRoutesAuth(app, db)
 	setupTransactionRoutes(app, db)
 	setupRoutesUser(app, db)
 }
