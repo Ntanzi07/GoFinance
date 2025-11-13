@@ -25,3 +25,7 @@ func LoadDBConfig() DBConfig {
 		DBName: os.Getenv("DB_NAME"),
 	}
 }
+
+func LoadJwt() []byte {
+	return []byte(os.Getenv("JWT_SECRET"))
+}

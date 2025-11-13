@@ -92,3 +92,15 @@ func (r *UsersRepository) DeleteUser(userID int) error {
 
 	return nil
 }
+
+func (r *UsersRepository) UserLogin(email string) (models.UserLogin, error) {
+
+	var user models.UserLogin
+	err := r.DB.QueryRow("CALL GetUserByEmail(?)", email).Scan(&user.Email, &user.Password)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+
+}
