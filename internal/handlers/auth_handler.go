@@ -17,7 +17,18 @@ func NewAuthHandler(repo *repository.UsersRepository) *AuthHandler {
 	return &AuthHandler{Repo: repo}
 }
 
-// LoginUserHandler handles user login and JWT token generation.
+// LoginUserHandler godoc
+// @Summary user login
+// @Description verify user credentials and login, returning a JWT token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param credentials body models.UserLogin true "User Login Credentials"
+// @Success 200 {object} map[string]string
+// @Failure 400 {string} string "JSON inválido"
+// @Failure 401 {string} string "Senha inválida"
+// @Failure 404 {string} string "Email não encontrado"
+// @Router /login [post]
 func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
 	var creds models.UserLogin
 
@@ -49,6 +60,17 @@ func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
 	})
 }
 
+// SingupUserHandler godoc
+// @Summary user signup
+// @Description signup for new user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body models.User true "New User Data"
+// @Success 200 {object} map[string]string
+// @Failure 400 {string} string "JSON inválido"
+// @Failure 500 {string} string "User not created :/"
+// @Router /signup [post]
 func (h *AuthHandler) SingupUserHandler(c *fiber.Ctx) error {
 	var user models.User
 	if err := c.BodyParser(&user); err != nil {

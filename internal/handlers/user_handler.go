@@ -15,6 +15,7 @@ func NewUsersHandler(repo *repository.UsersRepository) *UserHandler {
 	return &UserHandler{Repo: repo}
 }
 
+// verifyJwt verifies the JWT token and checks if the user has permissio
 func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
 	name := c.Params("name")
 
@@ -34,6 +35,18 @@ func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
 	return user, nil
 }
 
+// GetUserByNameHandler godoc
+// @Summary get user by name
+// @Description retrieve user details using their name
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param name path string true "User Name"
+// @Success 200 {object} models.User
+// @Failure 403 {string} string "Forbidden"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /{name}/infos [get]
 func (h *UserHandler) GetUserByNameHandler(c *fiber.Ctx) error {
 	user, err := h.verifyJwt(c)
 	if err != nil {
@@ -42,6 +55,18 @@ func (h *UserHandler) GetUserByNameHandler(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+// GetUserTransactions godoc
+// @Summary get user transactions
+// @Description retrieve all transactions for a specific user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param name path string true "User Name"
+// @Success 200 {array} models.Transaction
+// @Failure 403 {string} string "Forbidden"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /{name} [get]
 func (h *UserHandler) GetUserTransactions(c *fiber.Ctx) error {
 	name := c.Params("name")
 

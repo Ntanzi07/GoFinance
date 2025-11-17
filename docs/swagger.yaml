@@ -1,0 +1,290 @@
+basePath: /
+definitions:
+  models.Transaction:
+    properties:
+      amount:
+        format: float64
+        type: number
+      date:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  models.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Documentação da API GoFinance.
+  title: API Fiber
+  version: "1.0"
+paths:
+  /{name}:
+    get:
+      consumes:
+      - application/json
+      description: retrieve all transactions for a specific user
+      parameters:
+      - description: User Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: get user transactions
+      tags:
+      - Users
+  /{name}/infos:
+    get:
+      consumes:
+      - application/json
+      description: retrieve user details using their name
+      parameters:
+      - description: User Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: get user by name
+      tags:
+      - Users
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: verify user credentials and login, returning a JWT token
+      parameters:
+      - description: User Login Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: JSON inválido
+          schema:
+            type: string
+        "401":
+          description: Senha inválida
+          schema:
+            type: string
+        "404":
+          description: Email não encontrado
+          schema:
+            type: string
+      summary: user login
+      tags:
+      - Auth
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: signup for new user
+      parameters:
+      - description: New User Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: JSON inválido
+          schema:
+            type: string
+        "500":
+          description: User not created :/
+          schema:
+            type: string
+      summary: user signup
+      tags:
+      - Auth
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: retrieve all transaction records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get all transactions
+      tags:
+      - Transactions
+    post:
+      consumes:
+      - application/json
+      description: create a new transaction record
+      parameters:
+      - description: Transaction Data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction created successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: create a new transaction
+      tags:
+      - Transactions
+  /transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a transaction record by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: delete a transaction
+      tags:
+      - Transactions
+    get:
+      consumes:
+      - application/json
+      description: retrieve a specific transaction using its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get transaction by id
+      tags:
+      - Transactions
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

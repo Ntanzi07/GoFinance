@@ -6,6 +6,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// @title API Fiber
+// @version 1.0
+// @description Documentação da API GoFinance.
+// @host localhost:8080
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	//connect to database
 	db, err := database.Connect()
