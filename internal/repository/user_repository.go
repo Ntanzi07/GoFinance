@@ -58,6 +58,7 @@ func (r *UsersRepository) GetUserByName(name string) (models.User, error) {
 		&u.Email,
 		&u.Password,
 		&u.CreatedAt,
+		&u.IsAdmin,
 	)
 	if err != nil {
 		return u, err
@@ -96,7 +97,7 @@ func (r *UsersRepository) DeleteUser(userID int) error {
 func (r *UsersRepository) UserLogin(email string) (models.UserLogin, error) {
 
 	var user models.UserLogin
-	err := r.DB.QueryRow("CALL GetUserByEmail(?)", email).Scan(&user.Email, &user.Password)
+	err := r.DB.QueryRow("CALL GetUserCredentials(?)", email).Scan(&user.Email, &user.Password, &user.IsAdmin)
 	if err != nil {
 		return user, err
 	}

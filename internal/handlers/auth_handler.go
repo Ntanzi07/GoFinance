@@ -46,7 +46,8 @@ func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": user.Email,
+		"email":   user.Email,
+		"isAdmin": user.IsAdmin,
 		// "exp": time.Now().Add(time.Hour * 1).Unix(), // 👈 Descomente isso para adicionar expiração (1 hora)
 	})
 
@@ -82,7 +83,8 @@ func (h *AuthHandler) SingupUserHandler(c *fiber.Ctx) error {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": user.Email,
+		"email":   user.Email,
+		"isAdmin": user.IsAdmin,
 	})
 
 	tokenString, err := token.SignedString(config.LoadJwt())

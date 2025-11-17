@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/Ntanzi07/gofinance/internal/models"
 	"github.com/Ntanzi07/gofinance/internal/repository"
 	"github.com/gofiber/fiber/v2"
@@ -27,8 +29,12 @@ func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
+	isAdmin := claims["isAdmin"].(bool)
 
-	if user.Email != email {
+	fmt.Println(user.Email != email, !isAdmin)
+	fmt.Println(user.Email, email)
+
+	if user.Email != email && !isAdmin {
 		return models.User{}, fiber.NewError(fiber.StatusForbidden, "Você não tem permissão")
 	}
 
@@ -92,32 +98,6 @@ func (h *UsersHandler) GetAllUserHandler(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
-func (h *UsersHandler) GetUserByIdHandler(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid user ID")
-	}
-
-	user, err := h.Repo.GetUserByID(id)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error retrieving user")
-	}
-
-	return c.JSON(user)
-}
-
-func (h *UsersHandler) CreateUserHandler(c *fiber.Ctx) error {
-	var user models.User
-	if err := c.BodyParser(&user); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
-	}
-
-	if err := h.Repo.CreateUser(user.Name, user.Email, user.Password); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error creating user")
-	}
-
-	return c.SendString("User created successfully")
-}
 
 func (h *UsersHandler) DeleteUserHandler(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
