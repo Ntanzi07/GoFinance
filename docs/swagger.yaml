@@ -16,6 +16,18 @@ definitions:
       userID:
         type: integer
     type: object
+  models.TransactionCreate:
+    properties:
+      amount:
+        format: float64
+        type: number
+      date:
+        type: string
+      description:
+        type: string
+      type:
+        type: string
+    type: object
   models.User:
     properties:
       created_at:
@@ -24,15 +36,19 @@ definitions:
         type: string
       id:
         type: integer
+      is_admin:
+        type: boolean
       name:
         type: string
       password:
         type: string
     type: object
-  models.UserLogin:
+  models.UserCreds:
     properties:
       email:
         type: string
+      is_admin:
+        type: boolean
       password:
         type: string
     type: object
@@ -76,6 +92,46 @@ paths:
       summary: get user transactions
       tags:
       - Users
+    post:
+      consumes:
+      - application/json
+      description: create a new transaction associated with a specific user
+      parameters:
+      - description: User Name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Transaction Data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransactionCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: create a new transaction for a user
+      tags:
+      - Users
   /{name}/infos:
     get:
       consumes:
@@ -107,6 +163,46 @@ paths:
       summary: get user by name
       tags:
       - Users
+  /{name}/transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a specific transaction for a user
+      parameters:
+      - description: User Name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: delete a user transaction
+      tags:
+      - Users
   /login:
     post:
       consumes:
@@ -118,7 +214,7 @@ paths:
         name: credentials
         required: true
         schema:
-          $ref: '#/definitions/models.UserLogin'
+          $ref: '#/definitions/models.UserCreds'
       produces:
       - application/json
       responses:
@@ -196,64 +292,7 @@ paths:
       summary: get all transactions
       tags:
       - Transactions
-    post:
-      consumes:
-      - application/json
-      description: create a new transaction record
-      parameters:
-      - description: Transaction Data
-        in: body
-        name: transaction
-        required: true
-        schema:
-          $ref: '#/definitions/models.Transaction'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Transaction created successfully
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: create a new transaction
-      tags:
-      - Transactions
   /transactions/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: delete a transaction record by its ID
-      parameters:
-      - description: Transaction ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Transaction deleted successfully
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: delete a transaction
-      tags:
-      - Transactions
     get:
       consumes:
       - application/json

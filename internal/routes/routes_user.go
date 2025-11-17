@@ -23,5 +23,6 @@ func setupRoutesUser(app *fiber.App, db *sql.DB) {
 
 	protected.Get("/infos", handler.GetUserByNameHandler)
 	protected.Get("/", handler.GetUserTransactions)
+	protected.Post("/", handler.CreateUserTransaction)
 
 }

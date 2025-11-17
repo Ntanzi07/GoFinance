@@ -23,14 +23,14 @@ func NewAuthHandler(repo *repository.UsersRepository) *AuthHandler {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param credentials body models.UserLogin true "User Login Credentials"
+// @Param credentials body models.UserCreds true "User Login Credentials"
 // @Success 200 {object} map[string]string
 // @Failure 400 {string} string "JSON inválido"
 // @Failure 401 {string} string "Senha inválida"
 // @Failure 404 {string} string "Email não encontrado"
 // @Router /login [post]
 func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
-	var creds models.UserLogin
+	var creds models.UserCreds
 
 	if err := c.BodyParser(&creds); err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("JSON invalido!")
@@ -73,7 +73,7 @@ func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} string "User not created :/"
 // @Router /signup [post]
 func (h *AuthHandler) SingupUserHandler(c *fiber.Ctx) error {
-	var user models.User
+	var user models.UserSingUp
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("JSON invalido!")
 	}
@@ -84,7 +84,7 @@ func (h *AuthHandler) SingupUserHandler(c *fiber.Ctx) error {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":   user.Email,
-		"isAdmin": user.IsAdmin,
+		"isAdmin": false,
 	})
 
 	tokenString, err := token.SignedString(config.LoadJwt())

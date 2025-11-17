@@ -84,26 +84,68 @@ func (h *UserHandler) GetUserTransactions(c *fiber.Ctx) error {
 	return c.JSON(transactions)
 }
 
-/*
-func (h *UsersHandler) GetAllUserHandler(c *fiber.Ctx) error {
-	users, err := h.Repo.GetAllUsers()
+// CreateUserTransaction godoc
+// @Summary create a new transaction for a user
+// @Description create a new transaction associated with a specific user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param name path string true "User Name"
+// @Param transaction body models.TransactionCreate true "Transaction Data"
+// @Success 200 {object} models.Transaction
+// @Failure 400 {string} string "Bad Request"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /{name} [post]
+func (h *UserHandler) CreateUserTransaction(c *fiber.Ctx) error {
+	name := c.Params("name")
+
+	_, err := h.verifyJwt(c)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error retrieving users")
+		return err
 	}
-	return c.JSON(users)
+	var transaction models.TransactionCreate
+	if err := c.BodyParser(&transaction); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
+	}
+
+	if err := h.Repo.CreateUserTransaction(name, transaction.Type, transaction.Amount, transaction.Description, transaction.Date); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error creating transaction")
+	}
+	return c.JSON(transaction)
 }
 
+// DeleteUserTransaction godoc
+// @Summary delete a user transaction
+// @Description delete a specific transaction for a user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param name path string true "User Name"
+// @Param id path int true "Transaction ID"
+// @Success 200 {string} string "Transaction deleted successfully"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /{name}/transactions/{id} [delete]
+func (h *UserHandler) DeleteUserTransaction(c *fiber.Ctx) error {
+	name := c.Params("name")
 
-func (h *UsersHandler) DeleteUserHandler(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
+	transactionID, err := c.ParamsInt("id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid user ID")
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid transaction ID")
 	}
 
-	if err := h.Repo.DeleteUser(id); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error deleting user")
+	_, err = h.verifyJwt(c)
+	if err != nil {
+		return err
 	}
 
-	return c.SendString("User deleted successfully")
+	if err := h.Repo.DeleteUserTransaction(name, transactionID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error deleting transaction")
+	}
+
+	return c.SendString("Transaction deleted successfully")
 }
-*/

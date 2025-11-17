@@ -9,6 +9,13 @@ type Transaction struct {
 	Date        string
 }
 
+type TransactionCreate struct {
+	Type        string
+	Amount      float64
+	Description string
+	Date        string
+}
+
 type TransactionWithUser struct {
 	ID          int
 	Type        string

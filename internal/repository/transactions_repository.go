@@ -41,19 +41,3 @@ func (r *TransactionRepository) GetTransactionByID(id int) (models.TransactionWi
 	}
 	return t, nil
 }
-
-func (r *TransactionRepository) CreateTransaction(userID int, tType string, amount float64, description, date string) error {
-	_, err := r.DB.Exec("CALL CreateTransaction(?,?,?,?,?)", userID, tType, amount, description, date)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *TransactionRepository) DeleteTransaction(transactionID int) error {
-	_, err := r.DB.Exec("CALL DeleteTransaction(?)", transactionID)
-	if err != nil {
-		return err
-	}
-	return nil
-}

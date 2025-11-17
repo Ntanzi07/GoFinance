@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Ntanzi07/gofinance/internal/models"
 	"golang.org/x/crypto/bcrypt"
@@ -13,25 +14,6 @@ type UsersRepository struct {
 
 func NewUsersRepository(db *sql.DB) *UsersRepository {
 	return &UsersRepository{DB: db}
-}
-
-// GetAllUsers retrieves all users from the database.
-func (r *UsersRepository) GetAllUsers() ([]models.User, error) {
-	rows, err := r.DB.Query("CALL GetAllUsers()")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var users []models.User
-	for rows.Next() {
-		var u models.User
-		if err := rows.Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt); err != nil {
-			return nil, err
-		}
-		users = append(users, u)
-	}
-	return users, nil
 }
 
 // GetUserByID retrieves a user by their ID.
@@ -123,4 +105,47 @@ func (r *UsersRepository) GetAllUserTransactions(name string) ([]models.Transact
 	}
 
 	return allTransactions, nil
+}
+
+func (r *UsersRepository) CreateUserTransaction(UserName string, tType string, amount float64, description, date string) error {
+	user, err := r.GetUserByName(UserName)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.DB.Exec("CALL CreateTransaction(?,?,?,?,?)", user.ID, tType, amount, description, date)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *UsersRepository) DeleteUserTransaction(userName string, transactionID int) error {
+	user, err := r.GetUserByName(userName)
+	if err != nil {
+		return err
+	}
+
+	var transaction models.Transaction
+	err = r.DB.QueryRow("CALL GetTransactionById(?)", transactionID).Scan(
+		&transaction.ID,
+		&transaction.UserID,
+		&transaction.Type,
+		&transaction.Amount,
+		&transaction.Description,
+		&transaction.Date,
+	)
+	if err != nil {
+		return err
+	}
+
+	if user.ID != transaction.ID {
+		return fmt.Errorf("you do not have permission to delete this transaction")
+	}
+
+	_, err = r.DB.Exec("CALL DeleteTransaction(?)", transactionID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

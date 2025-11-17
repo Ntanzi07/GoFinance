@@ -10,7 +10,19 @@ type User struct {
 	IsAdmin   bool   `json:"is_admin"`
 }
 
+type UserSingUp struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type UserLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	IsAdmin  bool   `json:"is_admin"`
+}
+
+type UserCreds struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	IsAdmin  bool   `json:"is_admin"`
