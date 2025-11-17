@@ -34,6 +34,7 @@ func (h *TransactionHandler) verifyJwt(c *fiber.Ctx) error {
 // @Tags Transactions
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {array} models.Transaction
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /transactions [get]
@@ -55,6 +56,7 @@ func (h *TransactionHandler) GetAllTransactionsHandler(c *fiber.Ctx) error {
 // @Tags Transactions
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Transaction ID"
 // @Success 200 {object} models.Transaction
 // @Failure 400 {string} string "Bad Request"

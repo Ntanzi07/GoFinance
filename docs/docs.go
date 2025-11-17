@@ -121,6 +121,11 @@ const docTemplate = `{
         },
         "/transactions": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "retrieve all transaction records",
                 "consumes": [
                     "application/json"
@@ -153,6 +158,11 @@ const docTemplate = `{
         },
         "/transactions/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "retrieve a specific transaction using its ID",
                 "consumes": [
                     "application/json"
