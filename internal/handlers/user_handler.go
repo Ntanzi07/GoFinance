@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/Ntanzi07/gofinance/internal/models"
 	"github.com/Ntanzi07/gofinance/internal/repository"
 	"github.com/gofiber/fiber/v2"
@@ -30,9 +28,6 @@ func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
 	claims := userToken.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
 	isAdmin := claims["isAdmin"].(bool)
-
-	fmt.Println(user.Email != email, !isAdmin)
-	fmt.Println(user.Email, email)
 
 	if user.Email != email && !isAdmin {
 		return models.User{}, fiber.NewError(fiber.StatusForbidden, "Você não tem permissão")

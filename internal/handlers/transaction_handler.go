@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/Ntanzi07/gofinance/internal/models"
 	"github.com/Ntanzi07/gofinance/internal/repository"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type TransactionHandler struct {
@@ -12,6 +12,20 @@ type TransactionHandler struct {
 
 func NewTransactionHandler(repo *repository.TransactionRepository) *TransactionHandler {
 	return &TransactionHandler{Repo: repo}
+}
+
+// verifyJwt verifies the JWT token and checks if the user has permissio
+func (h *TransactionHandler) verifyJwt(c *fiber.Ctx) error {
+
+	userToken := c.Locals("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+	isAdmin := claims["isAdmin"].(bool)
+
+	if !isAdmin {
+		return fiber.NewError(fiber.StatusForbidden, "Você não tem permissão")
+	}
+
+	return nil
 }
 
 // GetAllTransactionsHandler godoc
@@ -24,6 +38,10 @@ func NewTransactionHandler(repo *repository.TransactionRepository) *TransactionH
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /transactions [get]
 func (h *TransactionHandler) GetAllTransactionsHandler(c *fiber.Ctx) error {
+	if err := h.verifyJwt(c); err != nil {
+		return err
+	}
+
 	transactions, err := h.Repo.GetAllTransactions()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -43,6 +61,10 @@ func (h *TransactionHandler) GetAllTransactionsHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /transactions/{id} [get]
 func (h *TransactionHandler) GetTransactionByIdHandler(c *fiber.Ctx) error {
+	if err := h.verifyJwt(c); err != nil {
+		return err
+	}
+
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
@@ -54,59 +76,4 @@ func (h *TransactionHandler) GetTransactionByIdHandler(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(transaction)
-}
-
-// CreateTransactionHandler godoc
-// @Summary create a new transaction
-// @Description create a new transaction record
-// @Tags Transactions
-// @Accept json
-// @Produce json
-// @Param transaction body models.Transaction true "Transaction Data"
-// @Success 200 {string} string "Transaction created successfully"
-// @Failure 400 {string} string "Bad Request"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /transactions [post]
-func (h *TransactionHandler) CreateTransactionHandler(c *fiber.Ctx) error {
-	var transaction models.Transaction
-
-	if err := c.BodyParser(&transaction); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-	}
-
-	if err := h.Repo.CreateTransaction(
-		transaction.UserID,
-		transaction.Type,
-		transaction.Amount,
-		transaction.Description,
-		transaction.Date,
-	); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-
-	return c.SendString("Transaction created successfully")
-}
-
-// DeleteTransacionHandler godoc
-// @Summary delete a transaction
-// @Description delete a transaction record by its ID
-// @Tags Transactions
-// @Accept json
-// @Produce json
-// @Param id path int true "Transaction ID"
-// @Success 200 {string} string "Transaction deleted successfully"
-// @Failure 400 {string} string "Bad Request"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /transactions/{id} [delete]
-func (h *TransactionHandler) DeleteTransacionHandler(c *fiber.Ctx) error {
-	id, err := c.ParamsInt("id")
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-	}
-
-	if err := h.Repo.DeleteTransaction(id); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-
-	return c.SendString("Transaction deleted successfully")
 }
