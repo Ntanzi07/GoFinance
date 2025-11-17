@@ -25,5 +25,4 @@ type UserLogin struct {
 type UserCreds struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	IsAdmin  bool   `json:"is_admin"`
 }

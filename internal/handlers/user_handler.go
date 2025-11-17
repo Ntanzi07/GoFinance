@@ -116,6 +116,53 @@ func (h *UserHandler) CreateUserTransaction(c *fiber.Ctx) error {
 	return c.JSON(transaction)
 }
 
+// UpdateUserTransaction godoc
+// @Summary update a user transaction
+// @Description update a specific transaction for a user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param name path string true "User Name"
+// @Param id path int true "Transaction ID"
+// @Param transaction body models.TransactionCreate true "Updated Transaction Data"
+// @Success 200 {string} string "Transaction updated successfully"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /{name}/transactions/{id} [put]
+func (h *UserHandler) UpdateUserTransaction(c *fiber.Ctx) error {
+	name := c.Params("name")
+
+	transactionID, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid transaction ID")
+	}
+
+	_, err = h.verifyJwt(c)
+	if err != nil {
+		return err
+	}
+
+	var transaction models.TransactionCreate
+	if err := c.BodyParser(&transaction); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
+	}
+
+	if err := h.Repo.UpdateUserTransaction(
+		name,
+		transactionID,
+		transaction.Type,
+		transaction.Amount,
+		transaction.Description,
+		transaction.Date,
+	); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error updating transaction")
+	}
+
+	return c.SendString("Transaction updated successfully")
+}
+
 // DeleteUserTransaction godoc
 // @Summary delete a user transaction
 // @Description delete a specific transaction for a user

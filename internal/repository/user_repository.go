@@ -120,6 +120,36 @@ func (r *UsersRepository) CreateUserTransaction(UserName string, tType string, a
 	return nil
 }
 
+func (r *UsersRepository) UpdateUserTransaction(userName string, transactionID int, tType string, amount float64, description, date string) error {
+	user, err := r.GetUserByName(userName)
+	if err != nil {
+		return err
+	}
+
+	var transaction models.Transaction
+	err = r.DB.QueryRow("CALL GetTransactionById(?)", transactionID).Scan(
+		&transaction.ID,
+		&transaction.UserID,
+		&transaction.Type,
+		&transaction.Amount,
+		&transaction.Description,
+		&transaction.Date,
+	)
+	if err != nil {
+		return err
+	}
+
+	if user.ID != transaction.UserID {
+		return fmt.Errorf("you do not have permission to update this transaction")
+	}
+
+	_, err = r.DB.Exec("CALL UpdateTransaction(?,?,?,?,?,?)", transactionID, tType, amount, description, date)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *UsersRepository) DeleteUserTransaction(userName string, transactionID int) error {
 	user, err := r.GetUserByName(userName)
 	if err != nil {

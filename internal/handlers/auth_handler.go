@@ -67,7 +67,7 @@ func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param user body models.User true "New User Data"
+// @Param user body models.UserSingUp true "New User Data"
 // @Success 200 {object} map[string]string
 // @Failure 400 {string} string "JSON inválido"
 // @Failure 500 {string} string "User not created :/"

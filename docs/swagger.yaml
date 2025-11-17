@@ -47,8 +47,15 @@ definitions:
     properties:
       email:
         type: string
-      is_admin:
-        type: boolean
+      password:
+        type: string
+    type: object
+  models.UserSingUp:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
       password:
         type: string
     type: object
@@ -203,6 +210,51 @@ paths:
       summary: delete a user transaction
       tags:
       - Users
+    put:
+      consumes:
+      - application/json
+      description: update a specific transaction for a user
+      parameters:
+      - description: User Name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated Transaction Data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransactionCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction updated successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: update a user transaction
+      tags:
+      - Users
   /login:
     post:
       consumes:
@@ -250,7 +302,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.UserSingUp'
       produces:
       - application/json
       responses:
