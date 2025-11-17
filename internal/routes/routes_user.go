@@ -15,12 +15,13 @@ func setupRoutesUser(app *fiber.App, db *sql.DB) {
 	repo := repository.NewUsersRepository(db)
 	handler := handlers.NewUsersHandler(repo)
 
-	protected := app.Group("/user")
+	protected := app.Group("/:name")
 
 	protected.Use(jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{Key: config.LoadJwt()},
 	}))
 
-	protected.Get("/:name", handler.GetUserByNameHandler)
+	protected.Get("/infos", handler.GetUserByNameHandler)
+	protected.Get("/", handler.GetUserTransactions)
 
 }

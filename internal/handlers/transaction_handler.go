@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/Ntanzi07/gofinance/internal/models"
 	"github.com/Ntanzi07/gofinance/internal/repository"
 	"github.com/gofiber/fiber/v2"
@@ -31,17 +29,6 @@ func (h *TransactionHandler) GetTransactionByIdHandler(c *fiber.Ctx) error {
 	}
 
 	transaction, err := h.Repo.GetTransactionByID(id)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-
-	return c.JSON(transaction)
-}
-
-func (h *TransactionHandler) GetTransactionsByUserHandler(c *fiber.Ctx) error {
-	name := c.Params("name")
-	fmt.Println("nome:", name)
-	transaction, err := h.Repo.GetAllTransactionsByUser(name)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}

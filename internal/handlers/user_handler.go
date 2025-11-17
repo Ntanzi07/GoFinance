@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/Ntanzi07/gofinance/internal/models"
 	"github.com/Ntanzi07/gofinance/internal/repository"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -12,6 +13,49 @@ type UserHandler struct {
 
 func NewUsersHandler(repo *repository.UsersRepository) *UserHandler {
 	return &UserHandler{Repo: repo}
+}
+
+func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
+	name := c.Params("name")
+
+	user, err := h.Repo.GetUserByName(name)
+	if err != nil {
+		return models.User{}, fiber.NewError(fiber.StatusInternalServerError, "Erro ao buscar usuário")
+	}
+
+	userToken := c.Locals("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	if user.Email != email {
+		return models.User{}, fiber.NewError(fiber.StatusForbidden, "Você não tem permissão")
+	}
+
+	return user, nil
+}
+
+func (h *UserHandler) GetUserByNameHandler(c *fiber.Ctx) error {
+	user, err := h.verifyJwt(c)
+	if err != nil {
+		return err
+	}
+	return c.JSON(user)
+}
+
+func (h *UserHandler) GetUserTransactions(c *fiber.Ctx) error {
+	name := c.Params("name")
+
+	_, err := h.verifyJwt(c)
+	if err != nil {
+		return err
+	}
+
+	transactions, err := h.Repo.GetAllUserTransactions(name)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error retrieving transactions")
+	}
+
+	return c.JSON(transactions)
 }
 
 /*
@@ -63,24 +107,3 @@ func (h *UsersHandler) DeleteUserHandler(c *fiber.Ctx) error {
 	return c.SendString("User deleted successfully")
 }
 */
-
-func (h *UserHandler) GetUserByNameHandler(c *fiber.Ctx) error {
-	name := c.Params("name")
-
-	user, err := h.Repo.GetUserByName(name)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error retrieving user")
-	}
-
-	userToken := c.Locals("user").(*jwt.Token)
-	claims := userToken.Claims.(jwt.MapClaims)
-	email := claims["email"].(string)
-
-	if user.Email != email {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "Você não tem permissão para acessar este recurso",
-		})
-	}
-
-	return c.JSON(user)
-}

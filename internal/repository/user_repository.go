@@ -104,3 +104,22 @@ func (r *UsersRepository) UserLogin(email string) (models.UserLogin, error) {
 	return user, nil
 
 }
+
+func (r *UsersRepository) GetAllUserTransactions(name string) ([]models.Transaction, error) {
+	rows, err := r.DB.Query("call GetAllTransactionsByUser(?)", name)
+	if err != nil {
+		return []models.Transaction{}, err
+	}
+
+	var allTransactions []models.Transaction
+	for rows.Next() {
+		var t models.Transaction
+		err := rows.Scan(&t.ID, &t.UserID, &t.Type, &t.Amount, &t.Description, &t.Date)
+		if err != nil {
+			return []models.Transaction{}, err
+		}
+		allTransactions = append(allTransactions, t)
+	}
+
+	return allTransactions, nil
+}
