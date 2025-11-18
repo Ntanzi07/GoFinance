@@ -138,7 +138,7 @@ func (h *UserHandler) CreateUserTransaction(c *fiber.Ctx) error {
 	transaction.Date = fixDateString(transaction.Date)
 
 	if err := h.Repo.CreateUserTransaction(name, transaction.Type, transaction.Amount, transaction.Description, transaction.Date); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error creating transaction")
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	return c.JSON(transaction)
 }
