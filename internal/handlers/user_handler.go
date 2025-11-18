@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"time"
+
 	"github.com/Ntanzi07/gofinance/internal/models"
 	"github.com/Ntanzi07/gofinance/internal/repository"
 	"github.com/gofiber/fiber/v2"
@@ -34,6 +36,28 @@ func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func fixDateString(dateStr string) string {
+	layouts := []string{
+		"2006-01-02",
+		"2006-01-02 15:04:05",
+		"02-01-2006",
+		"02-01-2006 15:04:05",
+		time.RFC3339,
+	}
+
+	var t time.Time
+	var err error
+
+	for _, layout := range layouts {
+		t, err = time.Parse(layout, dateStr)
+		if err == nil {
+			dateStr = t.Format("2006-01-02 15:04:05")
+			break
+		}
+	}
+	return dateStr
 }
 
 // GetUserByNameHandler godoc
@@ -109,6 +133,9 @@ func (h *UserHandler) CreateUserTransaction(c *fiber.Ctx) error {
 	if err := c.BodyParser(&transaction); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
+
+	// Fix the date string format
+	transaction.Date = fixDateString(transaction.Date)
 
 	if err := h.Repo.CreateUserTransaction(name, transaction.Type, transaction.Amount, transaction.Description, transaction.Date); err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error creating transaction")
