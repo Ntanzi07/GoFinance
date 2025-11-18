@@ -176,6 +176,8 @@ func (h *UserHandler) UpdateUserTransaction(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
+	transaction.Date = fixDateString(transaction.Date)
+
 	if err := h.Repo.UpdateUserTransaction(
 		name,
 		transactionID,
