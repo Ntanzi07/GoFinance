@@ -14,6 +14,8 @@ func NewTransactionRepository(db *sql.DB) *TransactionRepository {
 	return &TransactionRepository{DB: db}
 }
 
+// GetAllTransactions calls the stored procedure `GetAllTransactions` and
+// returns a list of transactions joined with user information.
 func (r *TransactionRepository) GetAllTransactions() ([]models.TransactionWithUser, error) {
 	rows, err := r.DB.Query("Call GetAllTransactions()")
 	if err != nil {
@@ -33,6 +35,8 @@ func (r *TransactionRepository) GetAllTransactions() ([]models.TransactionWithUs
 	return transactions, nil
 }
 
+// GetTransactionByID calls `GetTransactionById` stored procedure and returns
+// a single transaction (with user info) for the provided ID.
 func (r *TransactionRepository) GetTransactionByID(id int) (models.TransactionWithUser, error) {
 	var t models.TransactionWithUser
 	err := r.DB.QueryRow("CALL GetTransactionById(?)", id).Scan(&t.ID, &t.Type, &t.Amount, &t.Description, &t.Date, &t.UserName, &t.UserEmail)

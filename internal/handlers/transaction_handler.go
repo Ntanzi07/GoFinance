@@ -14,7 +14,12 @@ func NewTransactionHandler(repo *repository.TransactionRepository) *TransactionH
 	return &TransactionHandler{Repo: repo}
 }
 
-// verifyJwt verifies the JWT token and checks if the user has permissio
+// TransactionHandler handles HTTP requests related to transactions.
+// It holds a reference to a TransactionRepository for data access.
+
+// verifyJwt checks the JWT claims stored in the request context and
+// ensures the caller has admin privileges. The JWT middleware stores
+// the parsed token in `c.Locals("user")`.
 func (h *TransactionHandler) verifyJwt(c *fiber.Ctx) error {
 
 	userToken := c.Locals("user").(*jwt.Token)
@@ -39,10 +44,12 @@ func (h *TransactionHandler) verifyJwt(c *fiber.Ctx) error {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /transactions [get]
 func (h *TransactionHandler) GetAllTransactionsHandler(c *fiber.Ctx) error {
+	// Ensure caller is authorized (admin)
 	if err := h.verifyJwt(c); err != nil {
 		return err
 	}
 
+	// Fetch all transactions from repository (uses stored procedure)
 	transactions, err := h.Repo.GetAllTransactions()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -63,10 +70,12 @@ func (h *TransactionHandler) GetAllTransactionsHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /transactions/{id} [get]
 func (h *TransactionHandler) GetTransactionByIdHandler(c *fiber.Ctx) error {
+	// Check admin permission
 	if err := h.verifyJwt(c); err != nil {
 		return err
 	}
 
+	// Parse id param and fetch the transaction from repository
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())

@@ -8,6 +8,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// UsersRepository provides methods to access user-related data.
+// It relies on stored procedures defined in the database for most operations.
 type UsersRepository struct {
 	DB *sql.DB
 }
@@ -17,6 +19,7 @@ func NewUsersRepository(db *sql.DB) *UsersRepository {
 }
 
 // GetUserByID retrieves a user by their ID.
+// It calls the `GetUserById` stored procedure and scans the result into models.User.
 func (r *UsersRepository) GetUserByID(id int) (models.User, error) {
 	var u models.User
 	err := r.DB.QueryRow("CALL GetUserById(?)", id).Scan(
@@ -48,7 +51,8 @@ func (r *UsersRepository) GetUserByName(name string) (models.User, error) {
 	return u, nil
 }
 
-// CreateUser creates a new user with hashed password.
+// CreateUser creates a new user with a hashed password.
+// Password hashing is performed before calling the `CreateUser` stored procedure.
 func (r *UsersRepository) CreateUser(name, email, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -61,7 +65,8 @@ func (r *UsersRepository) CreateUser(name, email, password string) error {
 	return nil
 }
 
-// DeleteUser deletes a user by ID after retrieving and printing their information.
+// DeleteUser deletes a user by ID. It first attempts to retrieve the user
+// to validate existence before calling the `DeleteUser` stored procedure.
 func (r *UsersRepository) DeleteUser(userID int) error {
 	_, err := r.GetUserByID(userID)
 	if err != nil {

@@ -9,7 +9,10 @@ import (
 )
 
 func setupRoutesAuth(app *fiber.App, db *sql.DB) {
-
+	// Create repository and handler instances and wire them to endpoints.
+	// The repository receives the shared *sql.DB; the handler receives the
+	// repository (dependency injection). These endpoints are intentionally
+	// public so clients can obtain tokens and register new users.
 	repo := repository.NewUsersRepository(db)
 	handler := handlers.NewAuthHandler(repo)
 

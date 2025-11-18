@@ -17,7 +17,12 @@ func NewUsersHandler(repo *repository.UsersRepository) *UserHandler {
 	return &UserHandler{Repo: repo}
 }
 
-// verifyJwt verifies the JWT token and checks if the user has permissio
+// UserHandler handles requests related to users and their transactions.
+// The handler keeps a reference to UsersRepository to perform DB operations.
+
+// verifyJwt validates the JWT token stored in the request context and
+// ensures the calling user is either the same user requested or an admin.
+// It returns the user fetched from the repository for further checks.
 func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
 	name := c.Params("name")
 
@@ -31,6 +36,7 @@ func (h *UserHandler) verifyJwt(c *fiber.Ctx) (models.User, error) {
 	email := claims["email"].(string)
 	isAdmin := claims["isAdmin"].(bool)
 
+	// Allow access if token email matches the user or the caller is admin
 	if user.Email != email && !isAdmin {
 		return models.User{}, fiber.NewError(fiber.StatusForbidden, "Você não tem permissão")
 	}
@@ -59,6 +65,10 @@ func fixDateString(dateStr string) string {
 	}
 	return dateStr
 }
+
+// fixDateString attempts to parse several common date formats and returns
+// a normalized string in `YYYY-MM-DD HH:MM:SS` format. If parsing fails
+// it returns the original string unchanged.
 
 // GetUserByNameHandler godoc
 // @Summary get user by name

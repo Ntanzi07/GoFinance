@@ -36,6 +36,7 @@ func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("JSON invalido!")
 	}
 
+	// Fetch user credentials (email, hashed password, isAdmin) from repository
 	user, err := h.Repo.UserLogin(creds.Email)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("email not founded")
@@ -45,10 +46,12 @@ func (h *AuthHandler) LoginUserHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).SendString("Invalid password")
 	}
 
+	// Create a JWT token with minimal claims (email and isAdmin).
+	// Note: token expiration is commented out; consider adding `exp` claim.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":   user.Email,
 		"isAdmin": user.IsAdmin,
-		// "exp": time.Now().Add(time.Hour * 1).Unix(), // 👈 Descomente isso para adicionar expiração (1 hora)
+		// "exp": time.Now().Add(time.Hour * 1).Unix(), // 👈 Uncomment to add expiration (1 hour)
 	})
 
 	tokenString, err := token.SignedString(config.LoadJwt())
@@ -82,6 +85,7 @@ func (h *AuthHandler) SingupUserHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("User not created :/")
 	}
 
+	// After creating user, issue a token for the new account (not admin)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":   user.Email,
 		"isAdmin": false,

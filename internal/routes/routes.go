@@ -10,9 +10,10 @@ import (
 )
 
 func SetupRoutes(app *fiber.App, db *sql.DB) {
-
+	// Serve Swagger docs
 	app.Get("/docs/*", fiberSwagger.WrapHandler)
 
+	// Register route groups
 	setupRoutesAuth(app, db)
 	setupTransactionRoutes(app, db)
 	setupRoutesUser(app, db)
