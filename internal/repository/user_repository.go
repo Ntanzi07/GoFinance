@@ -143,7 +143,7 @@ func (r *UsersRepository) UpdateUserTransaction(userName string, transactionID i
 		return fmt.Errorf("you do not have permission to update this transaction")
 	}
 
-	_, err = r.DB.Exec("CALL UpdateTransaction(?,?,?,?,?,?)", transactionID, tType, amount, description, date)
+	_, err = r.DB.Exec("CALL UpdateUserTransaction(?,?,?,?,?)", transactionID, tType, amount, description, date)
 	if err != nil {
 		return err
 	}

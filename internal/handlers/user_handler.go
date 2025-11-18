@@ -186,7 +186,7 @@ func (h *UserHandler) UpdateUserTransaction(c *fiber.Ctx) error {
 		transaction.Description,
 		transaction.Date,
 	); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error updating transaction")
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
 	return c.SendString("Transaction updated successfully")
